@@ -1,0 +1,63 @@
+﻿@model IEnumerable<CategoriesViewModel>
+
+
+<div class="table-responsive mt-3">
+
+    @using (Html.BeginForm("Index", "Categories", FormMethod.Get))
+    {
+        <p>
+            <input type="text" name="searchTerm" placeholder="Search Categories name...">
+            <input type="submit" value="Tìm kiếm">
+        </p>
+    }
+    <a asp-action="Create">
+        <button type="button" class="btn btn-success">Add Categories</button>
+    </a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Categories in Model)
+            {
+                <tr>
+                    <td>
+                        @Categories.Id
+                    </td>
+                    <td>
+                        @Categories.Name
+                    </td>
+                    <td>
+                        @Categories.Description
+                    </td>
+                    <td>
+                        <img src="~/images/@Categories.Image" width="100" height="100" alt="Add picture">
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@Categories.Id">Edit</a>|
+                        <a asp-action="Delete" asp-route-id="@Categories.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        @if (ViewBag.TotalPages > 1)
+        {
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.PageNumber ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize })">@i</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
