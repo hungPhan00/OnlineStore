@@ -34,7 +34,7 @@ namespace OnlineStore.BusinessLogic.Services
 
             //map data with dto
             var OrdersDTOs = _mapper.Map<IEnumerable<OrdersDTO>>(Orders);
-            //var mappedData = _OrdersViewModelMapper.MapList(paginatedData.Data);            
+            //var mappedData = _OrdersViewModelMapper.MapList(paginatedData.Data);
             var totalOrdersCount = await _OrdersRepository.GetTotalCount();
             return (OrdersDTOs, totalOrdersCount);
         }

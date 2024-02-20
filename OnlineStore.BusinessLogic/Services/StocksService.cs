@@ -22,7 +22,18 @@ namespace OnlineStore.BusinessLogic.Services
             return _mapper.Map<List<StocksDTO>>(await _StocksRepository.GetAll());
         }
 
-        public async Task<(IEnumerable<StocksDTO>, int)> GetPaginatedStocks(string searchTerm, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<StocksDTO>, int)> GetPaginatedAndSearchData(int pageNumber, int pageSize, string searchTerm)
+        {
+            //Get peginated data
+            var stocks = await _StocksRepository.GetPaginatedAndSearchData(pageNumber, pageSize, searchTerm);
+
+            var stocksDTOs = _mapper.Map<IEnumerable<StocksDTO>>(stocks);
+
+            var totalStocksCount = await _StocksRepository.GetTotalCount();
+            return (stocksDTOs, totalStocksCount);
+        }
+
+        public async Task<(IEnumerable<StocksDTO>, int)> GetPaginatedStocks(int pageNumber, int pageSize)
         {
             //Get peginated data
             var Stocks = await _StocksRepository.GetPaginatedData(pageNumber, pageSize);
@@ -34,7 +45,7 @@ namespace OnlineStore.BusinessLogic.Services
             //}
             //map data with dto
             var StocksDTOs = _mapper.Map<IEnumerable<StocksDTO>>(Stocks);
-            //var mappedData = _StocksViewModelMapper.MapList(paginatedData.Data);            
+            //var mappedData = _StocksViewModelMapper.MapList(paginatedData.Data);
             var totalStocksCount = await _StocksRepository.GetTotalCount();
             return (StocksDTOs, totalStocksCount);
         }

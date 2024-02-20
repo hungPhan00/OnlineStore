@@ -1,18 +1,20 @@
-﻿@model IEnumerable<ProductsViewModel>
+﻿@model OnlineStore.cms.ViewModels.ProductsViewModel
 
 <div class="table-responsive mt-3">
-    
     @using (Html.BeginForm("Index", "Products", FormMethod.Get))
     {
         <div class="mb-3 d-flex">
             <input class="form-control input-lg mb-2 mt-3" id="inputlg" type="text" name="searchTerm" placeholder="Search name of product, category">
             <input class="mb-2 mt-3" type="submit" value="Tìm kiếm">
         </div>
-        
     }
-    <a asp-action="Create">
+    @* <a asp-action="Create">
         <button type="button" class="btn btn-success">Add Product</button>
-    </a>
+    </a> *@
+    <button type="button" id="create" class="btn btn-primary" data-toggle="modal" data-target="#createModal">
+        Add Product
+    </button>
+
     <table class="table">
         <thead>
             <tr>
@@ -28,11 +30,11 @@
                 <th>CreateAt</th>
                 <th>CategoryId</th>
                 <th>Thumbnail</th>
-                <th>Action</th>                
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var product in Model)
+            @foreach (var product in ViewBag.products)
             {
                 <tr>
                     <td>
@@ -62,6 +64,16 @@
                     <td>
                         <a asp-action="Edit" asp-route-id="@product.Id">Edit</a>|
                         <a asp-action="Delete" asp-route-id="@product.Id">Delete</a>
+@*                         <a asp-action="Edit" asp-route-id="@product.Id">
+                            <button type="button" id="edit" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal">
+                                Edit
+                            </button>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@product.Id">Delete</a>
+
+                        <button type="button" id="delete" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal">
+                            Delete
+                        </button> *@
                     </td>
                 </tr>
             }
@@ -80,4 +92,161 @@
             }
         </ul>
     }
+</div>
+
+<!-- Create product -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
+                <button type="button" id="createCloseBtnTop" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="Create" method="post" enctype="multipart/form-data" asp-controller="Products">
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label"></label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Description" class="control-label"></label>
+                                <input asp-for="Description" class="form-control" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Thumbnail" class="control-label"></label>
+                                <input type="file" name="file" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="UnitPrice" class="control-label"></label>
+                                <input asp-for="UnitPrice" class="form-control" />
+                                <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CreatedBy" class="control-label"></label>
+                                <input asp-for="CreatedBy" class="form-control" />
+                                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CategoryId" class="control-label"></label>
+                                <input asp-for="CategoryId" class="form-control" />
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Quantity" class="control-label"></label>
+                                <input asp-for="Quantity" class="form-control" />
+                                <span asp-validation-for="Quantity" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Upload" class="btn btn-primary" />
+                            </div>
+                            <button type="button" id="createCloseBtnBottom" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- edit product -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Product</h5>
+                <button type="button" id="editCloseBtnTop" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="Id" />
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label"></label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Description" class="control-label"></label>
+                                <input asp-for="Description" class="form-control" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Thumbnail" class="control-label"></label>
+                                <input type="file" name="file" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="UnitPrice" class="control-label"></label>
+                                <input asp-for="UnitPrice" class="form-control" />
+                                <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CreatedBy" class="control-label"></label>
+                                <input asp-for="CreatedBy" class="form-control" />
+                                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CreateAt" class="control-label"></label>
+                                <input asp-for="CreateAt" class="form-control" />
+                                <span asp-validation-for="CreateAt" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CategoryId" class="control-label"></label>
+                                <input asp-for="CategoryId" class="form-control" />
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="IsDelete" type="hidden" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Upload" class="btn btn-primary" />
+                            </div>
+                            <button type="button" id="editCloseBtnBottom" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete product -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Are you sure you want to delete this?</h5>
+                <button type="button" id="deleteCloseBtnTop" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <dl class="row">
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.Name)
+                        </dt>
+                        <dt class="col-sm-2">
+                            @Html.DisplayFor(model => model.Name)
+                        </dt>
+                    </dl>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="submit" value="Delete" class="btn btn-danger" />|
+                        <button type="button" id="deleteCloseBtnBottom" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

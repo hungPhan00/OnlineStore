@@ -11,6 +11,7 @@ namespace OnlineStore.DataAccess.Repositories
         public ProductsRepository(OnlineStoreContext dbContext) : base(dbContext)
         {
         }
+
         public async Task<IEnumerable<Products>> GetPaginatedAndSearchData(int pageNumber, int pageSize, string searchTerm)
         {
             IQueryable<Products> query = _dbContext.Set<Products>();

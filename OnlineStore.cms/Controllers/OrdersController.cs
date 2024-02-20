@@ -14,7 +14,7 @@ namespace OnlineStore.cms.Controllers
 
         public OrdersController(ILogger<OrdersController> logger, IOrdersService OrdersService, IMapper mapper)
         {
-            this._OrdersService = OrdersService;
+            _OrdersService = OrdersService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -67,9 +67,8 @@ namespace OnlineStore.cms.Controllers
 
             var Orders = _mapper.Map<OrdersDTO>(OrdersViewModel);
             await _OrdersService.Create(Orders);
-            
-            return RedirectToAction(nameof(Index));
 
+            return RedirectToAction(nameof(Index));
         }
 
         //Update: Display the form to edit a Orders
@@ -96,7 +95,6 @@ namespace OnlineStore.cms.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int Id, OrdersViewModel OrdersViewModel)
         {
-
             if (!ModelState.IsValid)
             {
                 return View(OrdersViewModel);
@@ -110,7 +108,6 @@ namespace OnlineStore.cms.Controllers
         //Delete: Display the confirmation page for deleting a Orders
         public async Task<IActionResult> Delete(int? id)
         {
-
             var Orders = await _OrdersService.GetOrders(id.Value);
             var OrdersVM = _mapper.Map<OrdersViewModel>(Orders);
             return View(OrdersVM);

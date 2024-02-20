@@ -14,7 +14,7 @@ namespace OnlineStore.cms.Controllers
 
         public CategoriesController(ILogger<CategoriesController> logger, ICategoriesService CategoriesService, IMapper mapper)
         {
-            this._CategoriesService = CategoriesService;
+            _CategoriesService = CategoriesService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -85,7 +85,6 @@ namespace OnlineStore.cms.Controllers
                 ViewBag.Message = "Invalid file";
             }
             return RedirectToAction(nameof(Index));
-
         }
 
         //Update: Display the form to edit a Categories
@@ -112,7 +111,6 @@ namespace OnlineStore.cms.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int Id, CategoriesViewModel CategoriesViewModel)
         {
-
             if (!ModelState.IsValid)
             {
                 return View(CategoriesViewModel);
@@ -126,7 +124,6 @@ namespace OnlineStore.cms.Controllers
         //Delete: Display the confirmation page for deleting a Categories
         public async Task<IActionResult> Delete(int? id)
         {
-
             var Categories = await _CategoriesService.GetCategories(id.Value);
             var CategoriesVM = _mapper.Map<CategoriesViewModel>(Categories);
             return View(CategoriesVM);

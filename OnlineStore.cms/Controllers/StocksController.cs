@@ -14,31 +14,34 @@ namespace OnlineStore.cms.Controllers
 
         public StocksController(ILogger<StocksController> logger, IStocksService StocksService, IMapper mapper)
         {
-            this._StocksService = StocksService;
+            _StocksService = StocksService;
             _mapper = mapper;
             _logger = logger;
         }
 
         public async Task<IActionResult> Index(string searchTerm, int? page)
         {
-            try
-            {
-                int pageSize = 5;
-                int pageNumber = (page ?? 1);
-                var (Stocks, totalStocksCount) = await _StocksService.GetPaginatedStocks(searchTerm, pageNumber, pageSize);
-                var StocksVM = _mapper.Map<IEnumerable<StocksViewModel>>(Stocks);
-                // Convert the list of Stocks to an instance of StaticPagedList<StocksViewModel>>
-                ViewBag.PageNumber = pageNumber;
-                ViewBag.PageSize = pageSize;
-                ViewBag.TotalPages = (int)Math.Ceiling((double)totalStocksCount / pageSize);
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+            (IEnumerable<StocksDTO> stocks, int totalProductCount) result;
 
-                return View(StocksVM);
-            }
-            catch (Exception ex)
+            if (searchTerm != null)
             {
-                _logger.LogError(ex, "An error occurred while retrieving Stocks");
-                return StatusCode(500, ex.Message);
+                result = await _StocksService.GetPaginatedAndSearchData(pageNumber, pageSize, searchTerm);
             }
+            else
+            {
+                result = await _StocksService.GetPaginatedStocks(pageNumber, pageSize);
+            }
+
+            var stocksVM = _mapper.Map<IEnumerable<StocksViewModel>>(result.stocks);
+            ViewBag.stocks = stocksVM;
+            ViewBag.SearchTerm = searchTerm;
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)result.totalProductCount / pageSize);
+
+            return View();
         }
 
         public async Task<IActionResult> IndexWithoutPagination()
@@ -67,9 +70,8 @@ namespace OnlineStore.cms.Controllers
 
             var Stocks = _mapper.Map<StocksDTO>(StocksViewModel);
             await _StocksService.Create(Stocks);
-            
-            return RedirectToAction(nameof(Index));
 
+            return RedirectToAction(nameof(Index));
         }
 
         //Update: Display the form to edit a Stocks
@@ -96,7 +98,6 @@ namespace OnlineStore.cms.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int Id, StocksViewModel StocksViewModel)
         {
-
             if (!ModelState.IsValid)
             {
                 return View(StocksViewModel);
@@ -110,7 +111,6 @@ namespace OnlineStore.cms.Controllers
         //Delete: Display the confirmation page for deleting a Stocks
         public async Task<IActionResult> Delete(int? id)
         {
-
             var Stocks = await _StocksService.GetStocks(id.Value);
             var StocksVM = _mapper.Map<StocksViewModel>(Stocks);
             return View(StocksVM);

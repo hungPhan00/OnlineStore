@@ -11,5 +11,6 @@
         public DateTime? CreateAt { get; set; }
         public int CategoryId { get; set; }
         public bool? IsDelete { get; set; }
+        public int Quantity { get; set; }
     }
 }

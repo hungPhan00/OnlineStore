@@ -9,8 +9,7 @@ public static class SeedData
     public static void Initialize(IServiceProvider serviceProvider)
     {
         using (var context = new OnlineStoreContext(
-            serviceProvider.GetRequiredService<
-                DbContextOptions<OnlineStoreContext>>()))
+            serviceProvider.GetRequiredService<DbContextOptions<OnlineStoreContext>>()))
         {
             // Look for any movies.
             if (context.Products.Any() && context.Categories.Any())

@@ -14,7 +14,7 @@ namespace OnlineStore.cms.Controllers
 
         public StockEventsController(ILogger<StockEventsController> logger, IStockEventsService StockEventsService, IMapper mapper)
         {
-            this._StockEventsService = StockEventsService;
+            _StockEventsService = StockEventsService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -67,9 +67,8 @@ namespace OnlineStore.cms.Controllers
 
             var StockEvents = _mapper.Map<StockEventsDTO>(StockEventsViewModel);
             await _StockEventsService.Create(StockEvents);
-            
-            return RedirectToAction(nameof(Index));
 
+            return RedirectToAction(nameof(Index));
         }
 
         //Update: Display the form to edit a StockEvents
@@ -96,7 +95,6 @@ namespace OnlineStore.cms.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int Id, StockEventsViewModel StockEventsViewModel)
         {
-
             if (!ModelState.IsValid)
             {
                 return View(StockEventsViewModel);
@@ -110,7 +108,6 @@ namespace OnlineStore.cms.Controllers
         //Delete: Display the confirmation page for deleting a StockEvents
         public async Task<IActionResult> Delete(int? id)
         {
-
             var StockEvents = await _StockEventsService.GetStockEvents(id.Value);
             var StockEventsVM = _mapper.Map<StockEventsViewModel>(StockEvents);
             return View(StockEventsVM);

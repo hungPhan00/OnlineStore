@@ -2,21 +2,21 @@
 using OnlineStore.DataAccess.Repositories;
 using OnlineStore.Domain.DTO;
 using OnlineStore.Domain.Entities;
-using OnlineStore.Domain.Interface.IRepositories;
+using OnlineStore.Domain.Enum;
 using OnlineStore.Domain.Interface.IServices;
-
 
 namespace OnlineStore.BusinessLogic.Services
 {
     public class ProductsService : IProductsService
     {
         private readonly ProductsRepository _productsRepository;
-        private readonly CategoriesRepository _categoriesRepository;
+        private readonly StockEventsRepository _stockEventsRepository;
         private readonly IMapper _mapper;
 
-        public ProductsService(ProductsRepository productsRepository, IMapper mapper)
+        public ProductsService(ProductsRepository productsRepository, StockEventsRepository stockEventsRepository, IMapper mapper)
         {
             _productsRepository = productsRepository;
+            _stockEventsRepository = stockEventsRepository;
             _mapper = mapper;
         }
 
@@ -25,15 +25,15 @@ namespace OnlineStore.BusinessLogic.Services
             return _mapper.Map<List<ProductsDTO>>(await _productsRepository.GetAll());
         }
 
-        public async Task<(IEnumerable<ProductsDTO>, int)> GetPaginatedAndSearchData( int pageNumber, int pageSize,string searchTerm)
+        public async Task<(IEnumerable<ProductsDTO>, int)> GetPaginatedAndSearchData(int pageNumber, int pageSize, string searchTerm)
         {
             //Get peginated data
             var products = await _productsRepository.GetPaginatedAndSearchData(pageNumber, pageSize, searchTerm);
 
             var productsDTOs = _mapper.Map<IEnumerable<ProductsDTO>>(products);
-        
+
             var totalProductCount = await _productsRepository.GetTotalCount();
-            return (productsDTOs,totalProductCount);
+            return (productsDTOs, totalProductCount);
         }
 
         public async Task<(IEnumerable<ProductsDTO>, int totalProductCount)> GetPaginatedData(int pageNumber, int pageSize)
@@ -52,20 +52,36 @@ namespace OnlineStore.BusinessLogic.Services
             return _mapper.Map<ProductsDTO>(await _productsRepository.GetById(id));
         }
 
-        public async Task<ProductsDTO> Create(ProductsDTO productsDTO)
+        public async Task<ProductsDTO> Create(ProductsDTO productsDTO, int? quantity)
         {
-
             //Mapping through AutoMapper
             var products = _mapper.Map<Products>(productsDTO);
-            products.CreateAt = DateTime.Now;
-            //Console.Write("aaaaaaaaaaaaaaaaaa");
-            //Console.WriteLine(products.ToString());
-            await _productsRepository.Create(products);            
 
+            //Console.WriteLine(products.ToString());
+            if (quantity == null)
+            {
+                quantity = 0;
+            }
+            Stocks stocks = new Stocks()
+            {
+                Quantity = quantity.Value
+            };
+            StockEvents stockEvent = new StockEvents()
+            {
+                Quantity = quantity.Value,
+                Type = StockEventTypes.IN,
+                Stocks = stocks,
+                Reason = "Create product",
+                CreateAt = DateTime.Now
+            };
+            products.Stock = stocks;
+            products.CreateAt = DateTime.Now;
+            await _productsRepository.Create(products);
+            await _stockEventsRepository.Create(stockEvent);
             return _mapper.Map<ProductsDTO>(products);
         }
 
-        public async Task Update(int Id,ProductsDTO productsDTO)
+        public async Task Update(int Id, ProductsDTO productsDTO)
         {
             var existingProduct = await _productsRepository.GetById(Id);
 

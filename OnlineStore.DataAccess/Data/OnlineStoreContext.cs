@@ -5,11 +5,9 @@ namespace OnlineStore.DataAccess.Data
 {
     public class OnlineStoreContext : DbContext
     {
-
         public OnlineStoreContext(DbContextOptions<OnlineStoreContext> options)
             : base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,6 +27,7 @@ namespace OnlineStore.DataAccess.Data
                 .HasForeignKey<Stocks>(s => s.Id)
                 .IsRequired(false);
         }
+
         public DbSet<Products> Products { get; set; } = default!;
         public DbSet<Categories> Categories { get; set; }
         public DbSet<Users> Users { get; set; }

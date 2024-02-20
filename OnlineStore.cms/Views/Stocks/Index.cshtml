@@ -1,0 +1,55 @@
+﻿@model OnlineStore.cms.ViewModels.StocksViewModel
+
+<div class="table-responsive mt-3">
+    @using (Html.BeginForm("Index", "Stocks", FormMethod.Get))
+    {
+        <div class="mb-3 d-flex">
+            <input class="form-control input-lg mb-2 mt-3" id="inputlg" type="text" name="searchTerm" placeholder="Search name of product, category">
+            <input class="mb-2 mt-3" type="submit" value="Tìm kiếm">
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Product Id</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var stock in ViewBag.Stocks)
+            {
+                <tr>
+                    <td>
+                        @stock.Id
+                    </td>
+                    <td>
+                        @stock.ProductId
+                    </td>
+                    <td>
+                        @stock.Quantity
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@stock.Id">Decrease</a>|
+                        <a asp-action="Delete" asp-route-id="@stock.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    @if (ViewBag.TotalPages > 1)
+    {
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.PageNumber ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { searchTerm = ViewBag.SearchTerm, page = i, pageSize = ViewBag.PageSize })">@i</a>
+                </li>
+            }
+        </ul>
+    }
+</div>

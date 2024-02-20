@@ -8,20 +8,24 @@ namespace OnlineStore.Domain.Entities
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity), Key()]
         [Display(Name = "ProductID")]
         public int Id { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
 
         [Column(TypeName = "nvarchar(200)")]
         public string? Thumbnail { get; set; }
+
         public float UnitPrice { get; set; }
+
         [ForeignKey("Users")]
-        public int? CreatedBy { get; set; }        
+        public int? CreatedBy { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime CreateAt { get; set; }
 
         [ForeignKey("Categories")]
-        public int CategoryId { get; set; }        
+        public int CategoryId { get; set; }
+
         public bool IsDelete { get; set; }
 
         public Users? Users { get; set; }

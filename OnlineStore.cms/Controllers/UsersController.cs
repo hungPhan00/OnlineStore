@@ -14,7 +14,7 @@ namespace OnlineStore.cms.Controllers
 
         public UsersController(ILogger<UsersController> logger, IUsersService UsersService, IMapper mapper)
         {
-            this._UsersService = UsersService;
+            _UsersService = UsersService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -67,7 +67,7 @@ namespace OnlineStore.cms.Controllers
 
             var Users = _mapper.Map<UsersDTO>(UsersViewModel);
             await _UsersService.Create(Users);
-            
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -95,7 +95,6 @@ namespace OnlineStore.cms.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int Id, UsersViewModel UsersViewModel)
         {
-
             if (!ModelState.IsValid)
             {
                 return View(UsersViewModel);
@@ -109,7 +108,6 @@ namespace OnlineStore.cms.Controllers
         //Delete: Display the confirmation page for deleting a Users
         public async Task<IActionResult> Delete(int? id)
         {
-
             var Users = await _UsersService.GetUsers(id.Value);
             var UsersVM = _mapper.Map<UsersViewModel>(Users);
             return View(UsersVM);

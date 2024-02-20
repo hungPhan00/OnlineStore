@@ -1,4 +1,5 @@
-﻿using OnlineStore.DataAccess.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using OnlineStore.DataAccess.Data;
 using OnlineStore.Domain.Entities;
 using OnlineStore.Domain.Interface.IRepositories;
 using System;
@@ -13,6 +14,24 @@ namespace OnlineStore.DataAccess.Repositories
     {
         public StocksRepository(OnlineStoreContext dbContext) : base(dbContext)
         {
+        }
+
+        public async Task<IEnumerable<Stocks>> GetPaginatedAndSearchData(int pageNumber, int pageSize, string searchTerm)
+        {
+            IQueryable<Stocks> query = _dbContext.Set<Stocks>();
+
+            if (searchTerm != null)
+            {
+                query = query.Where(p => p.ProductsStocks.Name.ToLower().Contains(searchTerm) || p.ProductsStocks.Categories.Name.ToLower().Contains(searchTerm));
+            }
+
+            var paginatedData = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return paginatedData;
         }
     }
 }

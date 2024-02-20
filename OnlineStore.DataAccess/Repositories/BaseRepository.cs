@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineStore.DataAccess.Data;
-using OnlineStore.Domain.Entities;
 using OnlineStore.Domain.Exceptions;
 using OnlineStore.Domain.Interface.IRepositories;
 
@@ -23,12 +22,27 @@ namespace OnlineStore.DataAccess.Repositories
 
         public async Task<IEnumerable<T>> GetPaginatedData(int pageNumber, int pageSize)
         {
-            var query = _dbContext.Set<T>()
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .AsNoTracking().ToListAsync();
-            
-            return await query;
+            var entityType = _dbContext.Model.FindEntityType(typeof(T));
+
+            if (entityType.FindProperty("IsDelete") != null)
+            {
+                var query = _dbContext.Set<T>()
+                    .Where(item => !EF.Property<bool>(item, "IsDelete"))
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .AsNoTracking().ToListAsync();
+
+                return await query;
+            }
+            else
+            {
+                var query = _dbContext.Set<T>()
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .AsNoTracking().ToListAsync();
+
+                return await query;
+            }
         }
 
         public async Task<int> GetTotalCount()
@@ -57,16 +71,42 @@ namespace OnlineStore.DataAccess.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        //public async Task Delete(T? model)
+        //{
+        //    _dbContext.Set<T>().Remove(model);
+        //    await _dbContext.SaveChangesAsync();
+        //}
         public async Task Delete(T? model)
         {
-            _dbContext.Set<T>().Remove(model);
-            await _dbContext.SaveChangesAsync();
+            if (model != null)
+            {
+                // Assuming your entity has an IsDeleted property
+                var softDeleteProperty = typeof(T).GetProperty("IsDelete");
+
+                if (softDeleteProperty != null)
+                {
+                    softDeleteProperty.SetValue(model, true);
+                    _dbContext.Entry(model).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    // Handle the case where the entity doesn't have an IsDeleted property
+                    throw new InvalidOperationException("Soft deletion is not supported for this entity.");
+                }
+            }
         }
+
+        //public async Task List<T> GetAllActive()
+        //{
+        //    return _dbContext.Set<T>()
+        //        .Where(e => !(bool)typeof(T).GetProperty("IsDeleted")?.GetValue(e))
+        //        .ToList();
+        //}
 
         public async Task SaveChangeAsync()
         {
             await _dbContext.SaveChangesAsync();
         }
-
     }
 }
